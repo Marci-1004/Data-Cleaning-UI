@@ -1,4 +1,5 @@
 This is a general-purpose time-series data cleaning user interface.
+
 It's main purpose is to perform the data cleaning task of the preparation of ML training data.
 
 A video guide is available at: https://youtu.be/vf5UN73QOW4
