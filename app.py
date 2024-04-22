@@ -2616,7 +2616,7 @@ with ui.nav_panel("Data Transformation"):
             with ui.layout_column_wrap(width=1):
                 with ui.tooltip(id="ttMV_3", placement="top"):
                     ui.input_action_button('SaveMVImputation','Save Imputation Results (Optional)', width='100%')
-                    ui.HTML("Optional, as this data will be available if the user moves forward with anomaly detection.")
+                    ui.HTML("Optional, as this data will be available if the user moves forward with outlier detection.")
                     ui.HTML("<br><br>Saves to desktop.")
 
                 # Save MV Dataframe
@@ -2791,8 +2791,8 @@ with ui.nav_panel("Data Transformation"):
                 ToRender = ToRender[['Downsampling','Runtime Estimate','Periods Lost','New Sampling Rate','Samples in Resampled Dataset']]
 
             return render.DataGrid(ToRender, row_selection_mode = 'single', width = '100%')
-#%% UI Anomaly Detection Panel
-with ui.nav_panel("Anomaly Detection"):
+#%% UI Outlier Detection Panel
+with ui.nav_panel("Outlier Detection"):
     with ui.navset_card_underline():
         with ui.nav_panel("Transformation Results"):
             with ui.layout_column_wrap(width=1, heights_equal='row'):
@@ -2859,7 +2859,7 @@ with ui.nav_panel("Anomaly Detection"):
                             
                             return fig
                         
-        with ui.nav_panel("Detect Anomalies"):
+        with ui.nav_panel("Detect Outliers"):
             with ui.accordion(id="ADVisAccordion", multiple=False):
                 with ui.accordion_panel("Calculation"):
                     with ui.layout_column_wrap(width = 1/3):
@@ -2883,14 +2883,14 @@ with ui.nav_panel("Anomaly Detection"):
                                             inline=True, width='100%', selected='BIC')
 
                     with ui.layout_column_wrap(width = 1/2):
-                        # Calculate Anomaly Detection
+                        # Calculate Outlier Detection
                         with ui.layout_column_wrap(width = 1):
                             @render.ui
                             def RenderDoAnomalyDetectionButton():
                                 if len(DataTransformColumns.get()) > 0:
-                                    return ui.input_action_button('DoAnomalyDetection','Compute Anomaly Detection',width='100%')
+                                    return ui.input_action_button('DoAnomalyDetection','Compute Outlier Detection',width='100%')
 
-                            # Generate Anomaly Detection with Multiple Possible Strictnesses
+                            # Generate Outlier Detection with Multiple Possible Strictnesses
                             @render.ui
                             @reactive.event(input.DoAnomalyDetection)
                             async def GenerateAnomalyDetectionResults():
@@ -2904,7 +2904,7 @@ with ui.nav_panel("Anomaly Detection"):
                                     AllAnomalies = []
 
                                     Desktop = winshell.desktop()
-                                    Folder = Desktop + '\\Data Cleaning - ' + input.FolderName() + '\\Anomaly Detection Results'
+                                    Folder = Desktop + '\\Data Cleaning - ' + input.FolderName() + '\\Outlier Detection Results'
 
                                     if not os.path.exists(Folder):
                                         os.makedirs(Folder)
@@ -2917,7 +2917,7 @@ with ui.nav_panel("Anomaly Detection"):
                                         else:
                                             Progress.set(value = ColIndex + 1)
 
-                                        NewPath = Folder + f'\\{Column} - Anomaly Detection.csv'
+                                        NewPath = Folder + f'\\{Column} - Outlier Detection.csv'
                                         
                                         ColumnTransforms = AllTransforms[ColIndex].copy()
                                         Timestamp = ColumnTransforms['Timestamp']
@@ -3027,11 +3027,11 @@ with ui.nav_panel("Anomaly Detection"):
 
                                     DataAnomalies.set(AllAnomalies)
 
-                                return "Anomaly Detection Completed and Saved!"
+                                return "Outlier Detection Completed and Saved!"
                             
                         with ui.tooltip(id="ttAD_1", placement="top"):
                             ui.input_file('AnomalyDetectFiles',
-                                          'Select Previously Calculated Anomaly Detection Data',
+                                          'Select Previously Calculated Outlier Detection Data',
                                           multiple=True, width='100%')
                             ui.HTML('Requires first reading the data transformations')
                         
@@ -3266,7 +3266,7 @@ with ui.nav_panel("Anomaly Detection"):
                             
                                 return fig
                             
-        with ui.nav_panel("Anomalies Between Features"):
+        with ui.nav_panel("Outliers Between Features"):
             with ui.accordion(id='ADFeatVisAccordion', open='Plot Settings', height='200%'):
                 with ui.accordion_panel('Plot Settings'):
                     with ui.layout_column_wrap(width=1, heights_equal='row'):
@@ -3602,7 +3602,7 @@ with ui.nav_panel("Anomaly Detection"):
                         @reactive.event(input.ADFeatVisSaveSettings)
                         async def CreateAnomalyDetectionSaveProgressBar():
                             with ui.Progress() as Progress:
-                                Progress.set(message="Saving Anomaly Detection Results")
+                                Progress.set(message="Saving Outlier Detection Results")
 
                                 ErrorCategories = ['Trend Level Average', 'Trend Level Increased', 'Trend Level Decreased', 'Trend Point Anomalies',
                                                    'Amplitude Level Average', 'Amplitude Level Increased', 'Amplitude Level Decreased',
@@ -3841,15 +3841,15 @@ with ui.nav_panel("Anomaly Detection"):
                                 if not os.path.exists(Folder):
                                     os.makedirs(Folder)
 
-                                NewPath = Folder + '\\Boolean Anomaly Detection Results - Set Strictnesses.csv'
+                                NewPath = Folder + '\\Boolean Outlier Detection Results - Set Strictnesses.csv'
                                 
                                 DataAnomaliesFiltered.set(ErrorDataframe)
                                 ErrorDataframe.to_csv(NewPath, index=False)
 
-                                NewPathRel = Folder + '\\Relative Anomaly Detection Results - Set Strictnesses.csv'
+                                NewPathRel = Folder + '\\Relative Outlier Detection Results - Set Strictnesses.csv'
                                 ErrorDataframeRelative.to_csv(NewPathRel, index=False)
 
-                            return "Anomaly Detection Results Saved!"
+                            return "Outlier Detection Results Saved!"
 
 
                 with ui.accordion_panel('Plot with the Strictest Available Settings'):
@@ -3909,7 +3909,7 @@ with ui.nav_panel("Anomaly Detection"):
 
                                         ax.set_xlabel('Timestamp')
                                         ax.set_ylim(0,CurrentMax * 1.2)
-                                        ax.set_title('Cumulative Sum of Detected Anomalies')
+                                        ax.set_title('Cumulative Sum of Detected Outliers')
 
                                         lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
                                         lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
@@ -3931,7 +3931,7 @@ with ui.nav_panel("Anomaly Detection"):
                                             ax.bar(np.arange(1,Spans+1), InSpan, label = Column, alpha=0.6)
                                         ax.set_xlabel('Span')
                                         ax.set_xticks(np.arange(1,Spans+1))
-                                        ax.set_title('Anomalies Detected Within Span')
+                                        ax.set_title('Outliers Detected Within Span')
                                         
                                         lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
                                         lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
@@ -3953,7 +3953,7 @@ with ui.nav_panel("Anomaly Detection"):
                                                              linecolor = 'black')
                                         plt.xticks(rotation=45)
                                         plt.yticks(rotation=0)
-                                        ax.set_title('Anomaly Correlation Heatmap')
+                                        ax.set_title('Outlier Correlation Heatmap')
                                     
                                         return fig
                                     
@@ -3969,7 +3969,7 @@ with ui.nav_panel("Anomaly Detection"):
                                                              linecolor = 'black')
                                         plt.xticks(rotation=45)
                                         plt.yticks(rotation=0)
-                                        ax.set_title('Anomaly Correlation Heatmap Between The Relative Values Within Components')
+                                        ax.set_title('Outlier Correlation Heatmap Between The Relative Values Within Components')
                                     
                                         return fig
                                 
@@ -3990,7 +3990,7 @@ with ui.nav_panel("Anomaly Rectification"):
         with ui.nav_panel("Calculation"):
             with ui.layout_column_wrap(width = 1, heights_equal='row'):
                 with ui.layout_column_wrap(width=1/2):
-                    ui.input_file('FinalizedAnomalyDetectionData', 'Select Anomaly Detection Result with Boolean Set Strictnesses', width = '100%')
+                    ui.input_file('FinalizedAnomalyDetectionData', 'Select Outlier Detection Result with Boolean Set Strictnesses', width = '100%')
 
                     ui.input_slider('AnomalyCorrectionMinimumCorrelation','Set Correlation Cutoff Value', 0.1, 1, 0.8, step=0.05, width = '100%')
 
